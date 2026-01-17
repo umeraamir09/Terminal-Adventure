@@ -1,97 +1,100 @@
 {{!< default}}
 {{!-- The tag above means - insert everything in this file into the {body} of the default.hbs template --}}
 
-<main id="site-main" class="site-main outer">
-<div class="inner posts">
-
-    <div class="post-feed">
-
+{{!-- Author Hero Section --}}
+<section class="author-hero">
+    <div class="container">
         {{#author}}
-        <section class="post-card post-card-large">
-
-            {{#if cover_image}}
-            <div class="post-card-image-link">
-                {{!-- This is a responsive image, it loads different sizes depending on device
-                https://medium.freecodecamp.org/a-guide-to-responsive-images-with-ready-to-use-templates-c400bd65c433 --}}
-                <img class="post-card-image"
-                    srcset="{{img_url cover_image size="s"}} 300w,
-                            {{img_url cover_image size="m"}} 600w,
-                            {{img_url cover_image size="l"}} 1000w,
-                            {{img_url cover_image size="xl"}} 2000w"
-                    sizes="(max-width: 1000px) 400px, 800px"
-                    src="{{img_url cover_image size="m"}}"
-                    alt="{{title}}"
-                />
-            </div>
-            {{/if}}
-
-            <div class="post-card-content">
-            <div class="post-card-content-link">
-
+        <div class="author-hero-inner">
+            <div class="author-hero-image">
                 {{#if profile_image}}
-                    <img class="author-profile-pic" src="{{profile_image}}" alt="{{name}}" />
+                <img src="{{img_url profile_image size="l"}}" alt="{{name}}" />
+                {{else}}
+                <div class="author-hero-avatar">{{> "icons/avatar"}}</div>
                 {{/if}}
-
-                <header class="post-card-header">
-                    <h2 class="post-card-title">{{name}}</h2>
-                </header>
-
+            </div>
+            <div class="author-hero-content">
+                <h1 class="author-hero-name">{{name}}</h1>
                 {{#if bio}}
-                    <div class="post-card-excerpt">{{bio}}</div>
+                <p class="author-hero-bio">{{bio}}</p>
                 {{/if}}
-
-                <footer class="author-profile-footer">
+                <div class="author-hero-meta">
                     {{#if location}}
-                        <div class="author-profile-location">{{location}}</div>
+                    <span class="author-hero-location">{{> "icons/location"}} {{location}}</span>
                     {{/if}}
-                    <div class="author-profile-meta">
-                        {{#if website}}
-                            <a class="author-profile-social-link" href="{{website}}" target="_blank" rel="noopener">{{website}}</a>
-                        {{/if}}
-                        {{#if twitter}}
-                            <a class="author-profile-social-link" href="{{social_url type="twitter"}}" target="_blank" rel="noopener">{{> "icons/twitter"}}</a>
-                        {{/if}}
-                        {{#if facebook}}
-                            <a class="author-profile-social-link" href="{{social_url type="facebook"}}" target="_blank" rel="noopener">{{> "icons/facebook"}}</a>
-                        {{/if}}
-                        {{#if linkedin}}
-                            <a class="author-profile-social-link" href="{{social_url type="linkedin"}}" target="_blank" rel="noopener">{{> "icons/linkedin"}}</a>
-                        {{/if}}
-                        {{#if bluesky}}
-                            <a class="author-profile-social-link" href="{{social_url type="bluesky"}}" target="_blank" rel="noopener">{{> "icons/bluesky"}}</a>
-                        {{/if}}
-                        {{#if threads}}
-                            <a class="author-profile-social-link" href="{{social_url type="threads"}}" target="_blank" rel="noopener">{{> "icons/threads"}}</a>
-                        {{/if}}
-                        {{#if mastodon}}
-                            <a class="author-profile-social-link" href="{{social_url type="mastodon"}}" target="_blank" rel="noopener">{{> "icons/mastodon"}}</a>
-                        {{/if}}
-                        {{#if tiktok}}
-                            <a class="author-profile-social-link" href="{{social_url type="tiktok"}}" target="_blank" rel="noopener">{{> "icons/tiktok"}}</a>
-                        {{/if}}
-                        {{#if youtube}}
-                            <a class="author-profile-social-link" href="{{social_url type="youtube"}}" target="_blank" rel="noopener">{{> "icons/youtube"}}</a>
-                        {{/if}}
-                        {{#if instagram}}
-                            <a class="author-profile-social-link" href="{{social_url type="instagram"}}" target="_blank" rel="noopener">{{> "icons/instagram"}}</a>
-                        {{/if}}
-                    </div>
-                </footer>
-
+                    <span class="author-hero-posts">{{plural ../pagination.total empty='No posts' singular='% post' plural='% posts'}}</span>
+                </div>
+                <div class="author-hero-social">
+                    {{#if website}}
+                    <a href="{{website}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/link"}}
+                    </a>
+                    {{/if}}
+                    {{#if twitter}}
+                    <a href="{{social_url type="twitter"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/twitter"}}
+                    </a>
+                    {{/if}}
+                    {{#if facebook}}
+                    <a href="{{social_url type="facebook"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/facebook"}}
+                    </a>
+                    {{/if}}
+                    {{#if linkedin}}
+                    <a href="{{social_url type="linkedin"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/linkedin"}}
+                    </a>
+                    {{/if}}
+                    {{#if bluesky}}
+                    <a href="{{social_url type="bluesky"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/bluesky"}}
+                    </a>
+                    {{/if}}
+                    {{#if threads}}
+                    <a href="{{social_url type="threads"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/threads"}}
+                    </a>
+                    {{/if}}
+                    {{#if instagram}}
+                    <a href="{{social_url type="instagram"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/instagram"}}
+                    </a>
+                    {{/if}}
+                    {{#if youtube}}
+                    <a href="{{social_url type="youtube"}}" class="author-social-link" target="_blank" rel="noopener">
+                        {{> "icons/youtube"}}
+                    </a>
+                    {{/if}}
+                </div>
             </div>
-            </div>
-
-        </section>
+        </div>
         {{/author}}
-
-        {{#foreach posts}}
-            {{!-- The tag below includes the markup for each post - partials/post-card.hbs --}}
-            {{> "post-card"}}
-        {{/foreach}}
-
     </div>
+</section>
 
-    {{pagination}}
-    
-</div>
-</main>
+{{!-- Posts by Author --}}
+<section class="content-section">
+    <div class="container">
+        <header class="section-header">
+            <h2 class="section-title">Posts by {{#author}}{{name}}{{/author}}</h2>
+        </header>
+
+        <div class="post-feed feed-magazine">
+            {{#foreach posts}}
+            {{> "post-card"}}
+            {{/foreach}}
+        </div>
+
+        {{!-- Pagination --}}
+        {{#if pagination.pages}}
+        {{#if pagination.next}}
+        <nav class="pagination">
+            <a href="{{pagination.next}}" class="pagination-btn pagination-next">
+                <span>Load more posts</span>
+                {{> "icons/arrow-down"}}
+            </a>
+        </nav>
+        {{/if}}
+        {{/if}}
+    </div>
+</section>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{@site.locale}}"{{#match @custom.color_scheme "Dark"}} class="dark-mode"{{else match @custom.color_scheme "Auto"}} class="auto-color"{{/match}}>
 <head>
-
     {{!-- Basic meta - advanced meta is output with {ghost_head} below --}}
     <title>{{meta_title}}</title>
     <meta charset="utf-8" />
@@ -9,111 +8,227 @@
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    {{!-- Preload scripts --}}
+    {{!-- Preload critical assets --}}
     <link rel="preload" as="style" href="{{asset "built/screen.css"}}" />
-    <link rel="preload" as="script" href="{{asset "built/casper.js"}}" />
-
-    {{!-- Theme assets - use the {asset} helper to reference styles & scripts,
-    this will take care of caching and cache-busting automatically --}}
+    <link rel="preload" as="script" href="{{asset "built/main.js"}}" />
+    
+    {{!-- Google Fonts for premium typography --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    {{!-- Theme stylesheet --}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/screen.css"}}" />
 
-    {{!-- This tag outputs all your advanced SEO meta, structured data, and other important settings,
-    it should always be the last tag before the closing head tag --}}
+    {{!-- Custom accent color styles --}}
+    <style>
+        :root {
+            --ghost-accent-color: {{@site.accent_color}};
+            --accent-color: {{@site.accent_color}};
+        }
+    </style>
+
+    {{!-- This tag outputs all your advanced SEO meta, structured data, etc --}}
     {{ghost_head}}
-
 </head>
-<body class="{{body_class}} is-head-{{#match @custom.navigation_layout "Logo on cover"}}left-logo{{else match @custom.navigation_layout "Logo in the middle"}}middle-logo{{else}}stacked{{/match}}{{#match @custom.title_font "=" "Elegant serif"}} has-serif-title{{/match}}{{#match @custom.body_font "=" "Modern sans-serif"}} has-sans-body{{/match}}{{#if @custom.show_publication_cover}} has-cover{{/if}}">
-<div class="viewport">
 
-    <header id="gh-head" class="gh-head outer{{#match @custom.header_style "Hidden"}} is-header-hidden{{/match}}">
-        <div class="gh-head-inner inner">
+<body class="{{body_class}}{{#match @custom.navigation_layout "Logo centered"}} nav-centered{{else match @custom.navigation_layout "Minimal"}} nav-minimal{{/match}}{{#match @custom.title_font "Elegant serif"}} has-serif-title{{else match @custom.title_font "Display"}} has-display-title{{/match}}{{#match @custom.body_font "Elegant serif"}} has-serif-body{{/match}}{{#if @custom.enable_animations}} has-animations{{/if}}{{#match @custom.accent_color_style "Gradient"}} accent-gradient{{else match @custom.accent_color_style "Subtle"}} accent-subtle{{/match}}">
+
+<div class="viewport">
+    {{!-- Reading Progress Bar --}}
+    {{#is "post"}}
+        {{#if @custom.show_reading_progress}}
+            <div class="reading-progress" id="reading-progress">
+                <div class="reading-progress-bar"></div>
+            </div>
+        {{/if}}
+    {{/is}}
+
+    {{!-- Site Header --}}
+    <header id="gh-head" class="gh-head{{#is "home"}} gh-head-transparent{{/is}}">
+        <div class="gh-head-inner container">
+            {{!-- Logo / Brand --}}
             <div class="gh-head-brand">
-                <a class="gh-head-logo{{#unless @site.logo}} no-image{{/unless}}" href="{{@site.url}}">
+                <a class="gh-head-logo" href="{{@site.url}}" aria-label="{{@site.title}}">
                     {{#if @site.logo}}
-                        <img src="{{@site.logo}}" alt="{{@site.title}}">
+                        <img src="{{@site.logo}}" alt="{{@site.title}}" />
                     {{else}}
-                        {{@site.title}}
+                        <span class="gh-head-logo-text">{{@site.title}}</span>
                     {{/if}}
                 </a>
-                <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search>{{> "icons/search"}}</button>
-                <button class="gh-burger" aria-label="Main Menu"></button>
             </div>
 
+            {{!-- Primary Navigation --}}
             <nav class="gh-head-menu">
                 {{navigation}}
-                {{#unless @site.members_enabled}}
-                    {{#match @custom.navigation_layout "Stacked"}}
-                        <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search>{{> "icons/search"}}</button>
-                    {{/match}}
-                {{/unless}}
             </nav>
 
+            {{!-- Secondary Actions --}}
             <div class="gh-head-actions">
-                {{#unless @site.members_enabled}}
-                    {{^match @custom.navigation_layout "Stacked"}}
-                        <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search>{{> "icons/search"}}</button>
-                    {{/match}}
-                {{else}}
-                    <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search>{{> "icons/search"}}</button>
+                {{!-- Search Button --}}
+                <button class="gh-search-btn" aria-label="Search" data-ghost-search>
+                    {{> "icons/search"}}
+                </button>
+
+                {{!-- Theme Toggle --}}
+                <button class="gh-theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="theme-toggle-light">{{> "icons/sun"}}</span>
+                    <span class="theme-toggle-dark">{{> "icons/moon"}}</span>
+                </button>
+
+                {{!-- Members Actions --}}
+                {{#if @site.members_enabled}}
                     <div class="gh-head-members">
                         {{#unless @member}}
                             {{#unless @site.members_invite_only}}
                                 <a class="gh-head-link" href="#/portal/signin" data-portal="signin">Sign in</a>
-                                <a class="gh-head-button" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                                <a class="gh-head-btn" href="#/portal/signup" data-portal="signup">Subscribe</a>
                             {{else}}
-                                <a class="gh-head-button" href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-head-btn" href="#/portal/signin" data-portal="signin">Sign in</a>
                             {{/unless}}
                         {{else}}
-                            <a class="gh-head-button" href="#/portal/account" data-portal="account">Account</a>
+                            <a class="gh-head-btn" href="#/portal/account" data-portal="account">Account</a>
                         {{/unless}}
                     </div>
-                {{/unless}}
+                {{/if}}
+
+                {{!-- Mobile Menu Toggle --}}
+                <button class="gh-burger" aria-label="Menu" aria-expanded="false">
+                    <span class="gh-burger-inner"></span>
+                </button>
+            </div>
+        </div>
+
+        {{!-- Mobile Navigation Overlay --}}
+        <div class="gh-mobile-menu" id="mobile-menu">
+            <div class="gh-mobile-menu-inner">
+                <nav class="gh-mobile-nav">
+                    {{navigation}}
+                </nav>
+                {{#if @site.members_enabled}}
+                    <div class="gh-mobile-actions">
+                        {{#unless @member}}
+                            {{#unless @site.members_invite_only}}
+                                <a class="gh-mobile-btn gh-mobile-btn-secondary" href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-mobile-btn gh-mobile-btn-primary" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                            {{else}}
+                                <a class="gh-mobile-btn gh-mobile-btn-primary" href="#/portal/signin" data-portal="signin">Sign in</a>
+                            {{/unless}}
+                        {{else}}
+                            <a class="gh-mobile-btn gh-mobile-btn-primary" href="#/portal/account" data-portal="account">Account</a>
+                        {{/unless}}
+                    </div>
+                {{/if}}
             </div>
         </div>
     </header>
 
-    <div class="site-content">
-        {{!-- All other templates get inserted here, index.hbs, post.hbs, etc --}}
+    {{!-- Main Content --}}
+    <main class="site-content">
         {{{body}}}
-    </div>
+    </main>
 
-    {{!-- The global footer at the very bottom of the screen --}}
-    <footer class="site-footer outer">
-        <div class="inner">
-            <section class="copyright"><a href="{{@site.url}}">{{@site.title}}</a> &copy; {{date format="YYYY"}}</section>
-            <nav class="site-footer-nav">
-                {{navigation type="secondary"}}
-            </nav>
-            <div class="gh-powered-by"><a href="https://ghost.org/" target="_blank" rel="noopener">Powered by Ghost</a></div>
+    {{!-- Newsletter Section --}}
+    {{#if @site.members_enabled}}
+    {{#unless @member}}
+        <section class="newsletter-section">
+            <div class="container">
+                <div class="newsletter-inner">
+                    <div class="newsletter-content">
+                        <h3 class="newsletter-title">{{#if @custom.email_signup_text}}{{@custom.email_signup_text}}{{else}}Stay up to date{{/if}}</h3>
+                        <p class="newsletter-description">Get notified when I publish something new, and unsubscribe at any time.</p>
+                    </div>
+                    <div class="newsletter-form">
+                        <form data-members-form="subscribe">
+                            <div class="newsletter-input-group">
+                                <input type="email" name="email" class="newsletter-input" placeholder="youremail@example.com" required data-members-email />
+                                <button type="submit" class="newsletter-btn">
+                                    <span class="btn-text">Subscribe</span>
+                                    <span class="btn-loader">{{> "icons/loader"}}</span>
+                                </button>
+                            </div>
+                            <p class="newsletter-message newsletter-message-success" data-members-success>Thanks for subscribing!</p>
+                            <p class="newsletter-message newsletter-message-error" data-members-error></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {{/unless}}
+    {{/if}}
+
+    {{!-- Site Footer --}}
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                {{!-- Footer Brand --}}
+                <div class="footer-brand">
+                    <a class="footer-logo" href="{{@site.url}}">
+                        {{#if @site.logo}}
+                            <img src="{{@site.logo}}" alt="{{@site.title}}" />
+                        {{else}}
+                            <span>{{@site.title}}</span>
+                        {{/if}}
+                    </a>
+                    {{#if @site.description}}
+                        <p class="footer-description">{{@site.description}}</p>
+                    {{/if}}
+                </div>
+
+                {{!-- Footer Navigation --}}
+                <nav class="footer-nav">
+                    <h4 class="footer-nav-title">Navigate</h4>
+                    {{navigation type="secondary"}}
+                </nav>
+
+                {{!-- Footer Social --}}
+                <div class="footer-social">
+                    <h4 class="footer-social-title">Follow us</h4>
+                    <div class="footer-social-links">
+                        {{#if @site.twitter}}
+                            <a href="{{@site.twitter}}" target="_blank" rel="noopener" aria-label="Twitter">{{> "icons/twitter"}}</a>
+                        {{/if}}
+                        {{#if @site.facebook}}
+                            <a href="{{@site.facebook}}" target="_blank" rel="noopener" aria-label="Facebook">{{> "icons/facebook"}}</a>
+                        {{/if}}
+                        <a href="{{@site.url}}/rss/" target="_blank" rel="noopener" aria-label="RSS Feed">{{> "icons/rss"}}</a>
+                    </div>
+                </div>
+            </div>
+
+            {{!-- Footer Bottom --}}
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    &copy; {{date format="YYYY"}} <a href="{{@site.url}}">{{@site.title}}</a>. All rights reserved.
+                </div>
+                <div class="footer-powered">
+                    {{#if @custom.footer_text}}
+                        {{@custom.footer_text}}
+                    {{else}}
+                        <a href="https://ghost.org" target="_blank" rel="noopener">Powered by Ghost</a>
+                    {{/if}}
+                </div>
+            </div>
         </div>
     </footer>
 
+    {{!-- Back to Top Button --}}
+    <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+        {{> "icons/arrow-up"}}
+    </button>
 </div>
 {{!-- /.viewport --}}
 
+{{!-- Lightbox for images --}}
 {{#is "post, page"}}
     {{> "lightbox"}}
 {{/is}}
 
-{{!-- Scripts - handle member signups, responsive videos, infinite scroll, floating headers, and galleries --}}
-<script
-    src="https://code.jquery.com/jquery-3.5.1.min.js"
-    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-    crossorigin="anonymous">
-</script>
-<script src="{{asset "built/casper.js"}}"></script>
-<script>
-$(document).ready(function () {
-    // Mobile Menu Trigger
-    $('.gh-burger').click(function () {
-        $('body').toggleClass('gh-head-open');
-    });
-    // FitVids - Makes video embeds responsive
-    $(".gh-content").fitVids();
-});
-</script>
+{{!-- Scripts --}}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="{{asset "built/main.js"}}"></script>
 
-{{!-- Ghost outputs required functional scripts with this tag - it should always be the last thing before the closing body tag --}}
+{{!-- Ghost outputs required functional scripts with this tag --}}
 {{ghost_foot}}
 
 </body>

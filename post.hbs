@@ -1,140 +1,288 @@
 {{!< default}}
-
-{{!-- The tag above means: insert everything in this file
-into the {body} tag of the default.hbs template --}}
-
+{{!-- The tag above means: insert everything in this file into the {body} tag of the default.hbs template --}}
 
 {{#post}}
 {{!-- Everything inside the #post block pulls data from the post --}}
 
-<main id="site-main" class="site-main">
-<article class="article {{post_class}} {{#match @custom.post_image_style "Full"}}image-full{{else match @custom.post_image_style "=" "Small"}}image-small{{/match}}">
-
-    <header class="article-header gh-canvas">
-
-        <div class="article-tag post-card-tags">
-            {{#primary_tag}}
-                <span class="post-card-primary-tag">
-                    <a href="{{url}}">{{name}}</a>
-                </span>
-            {{/primary_tag}}
-            {{#if featured}}
-                <span class="post-card-featured">{{> "icons/fire"}} Featured</span>
-            {{/if}}
+<article class="article post-full {{post_class}}">
+    {{!-- Post Header --}}
+    <header class="post-header{{#match @custom.post_image_style "Full bleed"}} post-header-full{{else match @custom.post_image_style "Contained"}} post-header-contained{{/match}}">
+        {{!-- Feature Image (Full bleed style) --}}
+        {{#match @custom.post_image_style "Full bleed"}}
+        {{#if feature_image}}
+        <div class="post-header-image">
+            <img srcset="{{img_url feature_image size="s"}} 300w,
+                        {{img_url feature_image size="m"}} 600w,
+                        {{img_url feature_image size="l"}} 1000w,
+                        {{img_url feature_image size="xl"}} 2000w"
+                sizes="100vw"
+                src="{{img_url feature_image size="xl"}}"
+                alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                loading="eager" />
+            <div class="post-header-overlay"></div>
         </div>
-
-        <h1 class="article-title">{{title}}</h1>
-
-        {{#if custom_excerpt}}
-            <p class="article-excerpt">{{custom_excerpt}}</p>
         {{/if}}
+        {{/match}}
 
-        <div class="article-byline">
-        <section class="article-byline-content">
+        <div class="container post-header-content{{#match @custom.post_image_style "Full bleed"}}{{#if feature_image}} has-image{{/if}}{{/match}}">
+            {{!-- Post Meta --}}
+            <div class="post-meta-top">
+                {{#primary_tag}}
+                <a href="{{url}}" class="post-tag">{{name}}</a>
+                {{/primary_tag}}
+                {{#if featured}}
+                <span class="post-featured-badge">{{> "icons/fire"}} Featured</span>
+                {{/if}}
+            </div>
 
-            <ul class="author-list instapaper_ignore">
-                {{#foreach authors}}
-                <li class="author-list-item">
-                    {{#if profile_image}}
-                    <a href="{{url}}" class="author-avatar" aria-label="Read more of {{name}}">
-                        <img class="author-profile-image" src="{{img_url profile_image size="xs"}}" alt="{{name}}" />
+            {{!-- Post Title --}}
+            <h1 class="post-title">{{title}}</h1>
+
+            {{!-- Post Excerpt --}}
+            {{#if custom_excerpt}}
+            <p class="post-excerpt">{{custom_excerpt}}</p>
+            {{/if}}
+
+            {{!-- Author & Meta --}}
+            <div class="post-byline">
+                <div class="post-authors">
+                    {{#foreach authors}}
+                    <a href="{{url}}" class="post-author">
+                        {{#if profile_image}}
+                        <img src="{{img_url profile_image size="xs"}}" alt="{{name}}" class="post-author-image" />
+                        {{else}}
+                        <span class="post-author-avatar">{{> "icons/avatar"}}</span>
+                        {{/if}}
+                        <span class="post-author-name">{{name}}</span>
                     </a>
-                    {{else}}
-                    <a href="{{url}}" class="author-avatar author-profile-image" aria-label="Read more of {{name}}">{{> "icons/avatar"}}</a>
-                    {{/if}}
-                </li>
-                {{/foreach}}
-            </ul>
-
-            <div class="article-byline-meta">
-                <h4 class="author-name">{{authors}}</h4>
-                <div class="byline-meta-content">
-                    <time class="byline-meta-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="DD MMM YYYY"}}</time>
+                    {{/foreach}}
+                </div>
+                <div class="post-meta">
+                    <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMMM D, YYYY"}}</time>
                     {{#if reading_time}}
-                        <span class="byline-reading-time"><span class="bull">&bull;</span> {{reading_time}}</span>
+                    <span class="post-reading-time">{{reading_time}}</span>
                     {{/if}}
                 </div>
             </div>
-
-        </section>
         </div>
 
+        {{!-- Feature Image (Wide/Contained styles) --}}
+        {{#match @custom.post_image_style "!=" "Full bleed"}}
         {{#match @custom.post_image_style "!=" "Hidden"}}
         {{#if feature_image}}
-            <figure class="article-image">
-                {{!-- This is a responsive image, it loads different sizes depending on device
-                https://medium.freecodecamp.org/a-guide-to-responsive-images-with-ready-to-use-templates-c400bd65c433 --}}
-                <img
-                    srcset="{{img_url feature_image size="s"}} 300w,
+        <div class="container">
+            <figure class="post-feature-image{{#match @custom.post_image_style "Contained"}} contained{{/match}}">
+                <img srcset="{{img_url feature_image size="s"}} 300w,
                             {{img_url feature_image size="m"}} 600w,
                             {{img_url feature_image size="l"}} 1000w,
                             {{img_url feature_image size="xl"}} 2000w"
                     sizes="(min-width: 1400px) 1400px, 92vw"
                     src="{{img_url feature_image size="xl"}}"
                     alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
-                />
+                    loading="eager" />
                 {{#if feature_image_caption}}
-                    <figcaption>{{feature_image_caption}}</figcaption>
+                <figcaption>{{feature_image_caption}}</figcaption>
                 {{/if}}
             </figure>
+        </div>
         {{/if}}
         {{/match}}
-
+        {{/match}}
     </header>
 
-    <section class="gh-content gh-canvas">
-        {{content}}
-    </section>
+    {{!-- Post Body --}}
+    <div class="post-body">
+        <div class="container">
+            <div class="post-body-inner">
+                {{!-- Table of Contents Sidebar --}}
+                {{#if @custom.show_toc}}
+                <aside class="post-toc" id="post-toc">
+                    <div class="post-toc-inner">
+                        <h4 class="post-toc-title">Table of Contents</h4>
+                        <nav class="post-toc-nav" id="toc-nav">
+                            {{!-- TOC is generated by JavaScript --}}
+                        </nav>
+                    </div>
+                </aside>
+                {{/if}}
 
-    {{#if comments}}
-        <section class="article-comments gh-canvas">
-            {{comments}}
-        </section>
-    {{/if}}
+                {{!-- Main Content --}}
+                <div class="post-content gh-content">
+                    {{content}}
+                </div>
 
+                {{!-- Share Sidebar (Desktop) --}}
+                {{#if @custom.show_share_buttons}}
+                <aside class="post-share-sidebar" id="share-sidebar">
+                    <div class="post-share-inner">
+                        <span class="post-share-label">Share</span>
+                        <div class="post-share-buttons">
+                            <a href="https://twitter.com/intent/tweet?text={{encode title}}&url={{url absolute="true"}}" class="share-btn share-twitter" target="_blank" rel="noopener" aria-label="Share on Twitter">
+                                {{> "icons/twitter"}}
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{url absolute="true"}}" class="share-btn share-facebook" target="_blank" rel="noopener" aria-label="Share on Facebook">
+                                {{> "icons/facebook"}}
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{url absolute="true"}}&title={{encode title}}" class="share-btn share-linkedin" target="_blank" rel="noopener" aria-label="Share on LinkedIn">
+                                {{> "icons/linkedin"}}
+                            </a>
+                            <button class="share-btn share-copy" data-url="{{url absolute="true"}}" aria-label="Copy link">
+                                {{> "icons/link"}}
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    {{!-- Post Footer --}}
+    <footer class="post-footer">
+        <div class="container">
+            {{!-- Tags --}}
+            {{#if tags}}
+            <div class="post-tags-section">
+                <h4 class="post-tags-title">Tags</h4>
+                <div class="post-tags-list">
+                    {{#foreach tags}}
+                    <a href="{{url}}" class="post-tag-item">{{name}}</a>
+                    {{/foreach}}
+                </div>
+            </div>
+            {{/if}}
+
+            {{!-- Share Buttons (Mobile) --}}
+            {{#if @custom.show_share_buttons}}
+            <div class="post-share-mobile">
+                <h4 class="post-share-title">Share this post</h4>
+                <div class="post-share-buttons-mobile">
+                    <a href="https://twitter.com/intent/tweet?text={{encode title}}&url={{url absolute="true"}}" class="share-btn-mobile share-twitter" target="_blank" rel="noopener">
+                        {{> "icons/twitter"}}
+                        <span>Twitter</span>
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{url absolute="true"}}" class="share-btn-mobile share-facebook" target="_blank" rel="noopener">
+                        {{> "icons/facebook"}}
+                        <span>Facebook</span>
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{url absolute="true"}}&title={{encode title}}" class="share-btn-mobile share-linkedin" target="_blank" rel="noopener">
+                        {{> "icons/linkedin"}}
+                        <span>LinkedIn</span>
+                    </a>
+                    <button class="share-btn-mobile share-copy" data-url="{{url absolute="true"}}">
+                        {{> "icons/link"}}
+                        <span>Copy Link</span>
+                    </button>
+                </div>
+            </div>
+            {{/if}}
+
+            {{!-- Author Card --}}
+            {{#if @custom.show_author_card}}
+            {{#foreach authors}}
+            <div class="author-card">
+                <div class="author-card-inner">
+                    <a href="{{url}}" class="author-card-image-link">
+                        {{#if profile_image}}
+                        <img src="{{img_url profile_image size="m"}}" alt="{{name}}" class="author-card-image" />
+                        {{else}}
+                        <span class="author-card-avatar">{{> "icons/avatar"}}</span>
+                        {{/if}}
+                    </a>
+                    <div class="author-card-content">
+                        <h4 class="author-card-name">
+                            <a href="{{url}}">{{name}}</a>
+                        </h4>
+                        {{#if bio}}
+                        <p class="author-card-bio">{{bio}}</p>
+                        {{/if}}
+                        <div class="author-card-meta">
+                            {{#if location}}
+                            <span class="author-card-location">{{> "icons/location"}} {{location}}</span>
+                            {{/if}}
+                            {{#if website}}
+                            <a href="{{website}}" class="author-card-website" target="_blank" rel="noopener">{{> "icons/link"}} Website</a>
+                            {{/if}}
+                            {{#if twitter}}
+                            <a href="{{social_url type="twitter"}}" class="author-card-social" target="_blank" rel="noopener">{{> "icons/twitter"}}</a>
+                            {{/if}}
+                            {{#if facebook}}
+                            <a href="{{social_url type="facebook"}}" class="author-card-social" target="_blank" rel="noopener">{{> "icons/facebook"}}</a>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/foreach}}
+            {{/if}}
+
+            {{!-- Comments --}}
+            {{#if comments}}
+            <section class="post-comments">
+                {{comments}}
+            </section>
+            {{/if}}
+        </div>
+    </footer>
 </article>
-</main>
 
-{{!-- A signup call to action is displayed here, unless viewed as a logged-in member --}}
+{{!-- CTA Section --}}
 {{#if @site.members_enabled}}
 {{#unless @member}}
 {{#unless @site.comments_enabled}}
 {{#if access}}
-    <section class="footer-cta outer">
-        <div class="inner">
-            {{#if @custom.email_signup_text}}<h2 class="footer-cta-title">{{@custom.email_signup_text}}</h2>{{/if}}
-            <a class="footer-cta-button" href="#/portal" data-portal>
-                <div class="footer-cta-input">Enter your email</div>
-                <span>Subscribe</span>
-            </a>
+<section class="post-cta">
+    <div class="container">
+        <div class="post-cta-inner">
+            <h3 class="post-cta-title">{{#if @custom.email_signup_text}}{{@custom.email_signup_text}}{{else}}Enjoyed this article?{{/if}}</h3>
+            <p class="post-cta-description">Subscribe to get notified when we publish more content like this.</p>
+            <a href="#/portal" class="post-cta-btn" data-portal>Subscribe Now</a>
         </div>
-    </section>
+    </div>
+</section>
 {{/if}}
 {{/unless}}
 {{/unless}}
 {{/if}}
 
-
-{{!-- Read more links, just above the footer --}}
-{{#if @custom.show_recent_posts_footer}}
-    {{!-- The {#get} helper below fetches some of the latest posts here
-    so that people have something else to read when they finish this one.
-
-    This query gets the latest 3 posts on the site, but adds a filter to
-    exclude the post we're currently on from being included. --}}
-    {{#get "posts" filter="id:-{{id}}" limit="3" as |more_posts|}}
-
-        {{#if more_posts}}
-            <aside class="read-more-wrap outer">
-                <div class="read-more inner">
-                    {{#foreach more_posts}}
-                        {{> "post-card"}}
-                    {{/foreach}}
-                </div>
-            </aside>
-        {{/if}}
-
-    {{/get}}
+{{!-- Related Posts --}}
+{{#if @custom.show_related_posts}}
+{{#get "posts" filter="id:-{{id}}+tag:{{primary_tag.slug}}" limit="3" include="tags,authors" as |related|}}
+{{#if related}}
+<section class="related-posts">
+    <div class="container">
+        <header class="related-header">
+            <h3 class="related-title">Related Posts</h3>
+            <p class="related-description">You might also enjoy these articles</p>
+        </header>
+        <div class="related-grid">
+            {{#foreach related}}
+            {{> "post-card"}}
+            {{/foreach}}
+        </div>
+    </div>
+</section>
+{{else}}
+{{!-- Fallback to recent posts if no related posts found --}}
+{{#get "posts" filter="id:-{{id}}" limit="3" include="tags,authors" as |recent|}}
+{{#if recent}}
+<section class="related-posts">
+    <div class="container">
+        <header class="related-header">
+            <h3 class="related-title">More Posts</h3>
+            <p class="related-description">Continue reading</p>
+        </header>
+        <div class="related-grid">
+            {{#foreach recent}}
+            {{> "post-card"}}
+            {{/foreach}}
+        </div>
+    </div>
+</section>
+{{/if}}
+{{/get}}
+{{/if}}
+{{/get}}
 {{/if}}
 
 {{/post}}

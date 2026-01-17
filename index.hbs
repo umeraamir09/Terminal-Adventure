@@ -1,54 +1,240 @@
 {{!< default}}
-{{!-- The tag above means: insert everything in this file
-into the {body} of the default.hbs template --}}
+{{!-- The tag above means: insert everything in this file into the {body} of the default.hbs template --}}
 
-<div class="site-header-content outer{{#match @custom.header_style "Left aligned"}} left-aligned{{/match}}{{#unless @custom.show_publication_cover}}{{#match @custom.header_style "Hidden"}} no-content{{/match}}{{/unless}}">
-
-    {{#if @custom.show_publication_cover}}
-        {{#if @site.cover_image}}
-            {{!-- This is a responsive image, it loads different sizes depending on device
-            https://medium.freecodecamp.org/a-guide-to-responsive-images-with-ready-to-use-templates-c400bd65c433 --}}
-            <img class="site-header-cover"
-                srcset="{{img_url @site.cover_image size="s"}} 300w,
-                        {{img_url @site.cover_image size="m"}} 600w,
-                        {{img_url @site.cover_image size="l"}} 1000w,
-                        {{img_url @site.cover_image size="xl"}} 2000w"
-                sizes="100vw"
-                src="{{img_url @site.cover_image size="xl"}}"
-                alt="{{@site.title}}"
-            />
-        {{/if}}
-    {{/if}}
-
-    {{#match @custom.header_style "!=" "Hidden"}}
-        <div class="site-header-inner inner">
-            {{#match @custom.navigation_layout "Logo on cover"}}
-                {{#if @site.logo}}
-                    <img class="site-logo" src="{{@site.logo}}" alt="{{@site.title}}">
+{{!-- Hero Section --}}
+{{#if @custom.show_hero_section}}
+{{#is "home, paged"}}
+{{#is "home"}}
+<section class="hero-section{{#match @custom.hero_style "Featured slider"}} hero-slider{{else match @custom.hero_style "Large featured"}} hero-large{{else match @custom.hero_style "Grid featured"}} hero-grid{{else}} hero-minimal{{/match}}">
+    <div class="container">
+        {{#match @custom.hero_style "Featured slider"}}
+            {{!-- Featured Posts Slider --}}
+            {{#get "posts" filter="featured:true" limit="5" include="tags,authors"}}
+                {{#if posts}}
+                <div class="hero-slider-wrapper">
+                    <div class="hero-slider-track" id="hero-slider">
+                        {{#foreach posts}}
+                        <article class="hero-slide{{#if @first}} active{{/if}}" data-index="{{@index}}">
+                            <div class="hero-slide-image">
+                                {{#if feature_image}}
+                                <img srcset="{{img_url feature_image size="s"}} 300w,
+                                            {{img_url feature_image size="m"}} 600w,
+                                            {{img_url feature_image size="l"}} 1000w,
+                                            {{img_url feature_image size="xl"}} 2000w"
+                                    sizes="100vw"
+                                    src="{{img_url feature_image size="xl"}}"
+                                    alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                                    loading="{{#if @first}}eager{{else}}lazy{{/if}}" />
+                                {{/if}}
+                                <div class="hero-slide-overlay"></div>
+                            </div>
+                            <div class="hero-slide-content">
+                                {{#primary_tag}}
+                                <a href="{{url}}" class="hero-slide-tag">{{name}}</a>
+                                {{/primary_tag}}
+                                <h2 class="hero-slide-title">
+                                    <a href="{{url}}">{{title}}</a>
+                                </h2>
+                                {{#if excerpt}}
+                                <p class="hero-slide-excerpt">{{excerpt words="20"}}</p>
+                                {{/if}}
+                                <div class="hero-slide-meta">
+                                    {{#primary_author}}
+                                    <a href="{{url}}" class="hero-slide-author">
+                                        {{#if profile_image}}
+                                        <img src="{{img_url profile_image size="xs"}}" alt="{{name}}" class="hero-slide-author-image" />
+                                        {{/if}}
+                                        <span>{{name}}</span>
+                                    </a>
+                                    {{/primary_author}}
+                                    <span class="hero-slide-date">{{date format="MMM D, YYYY"}}</span>
+                                    {{#if reading_time}}
+                                    <span class="hero-slide-reading-time">{{reading_time}}</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </article>
+                        {{/foreach}}
+                    </div>
+                    {{#if posts.length}}
+                    {{#has number=">=2"}}
+                    <div class="hero-slider-nav">
+                        <button class="hero-slider-btn hero-slider-prev" aria-label="Previous slide">
+                            {{> "icons/arrow-left"}}
+                        </button>
+                        <div class="hero-slider-dots">
+                            {{#foreach posts}}
+                            <button class="hero-slider-dot{{#if @first}} active{{/if}}" data-index="{{@index}}" aria-label="Go to slide {{@number}}"></button>
+                            {{/foreach}}
+                        </div>
+                        <button class="hero-slider-btn hero-slider-next" aria-label="Next slide">
+                            {{> "icons/arrow-right"}}
+                        </button>
+                    </div>
+                    {{/has}}
+                    {{/if}}
+                </div>
                 {{else}}
-                    <h1 class="site-title">{{@site.title}}</h1>
+                {{!-- Fallback if no featured posts --}}
+                <div class="hero-welcome">
+                    <h1 class="hero-welcome-title">{{@site.title}}</h1>
+                    {{#if @site.description}}
+                    <p class="hero-welcome-description">{{@site.description}}</p>
+                    {{/if}}
+                </div>
                 {{/if}}
-            {{/match}}
-            {{#if @site.description}}
-                <p class="site-description">{{@site.description}}</p>
-            {{/if}}
-        </div>
-    {{/match}}
-
-</div>
-
-{{!-- The main content area --}}
-<main id="site-main" class="site-main outer">
-<div class="inner posts">
-
-    <div class="post-feed">
-        {{#foreach posts}}
-            {{!-- The tag below includes the markup for each post - partials/post-card.hbs --}}
-            {{> "post-card"}}
-        {{/foreach}}
+            {{/get}}
+        {{else match @custom.hero_style "Large featured"}}
+            {{!-- Single Large Featured Post --}}
+            {{#get "posts" filter="featured:true" limit="1" include="tags,authors"}}
+                {{#if posts}}
+                {{#foreach posts}}
+                <article class="hero-large-post">
+                    <div class="hero-large-image">
+                        {{#if feature_image}}
+                        <img srcset="{{img_url feature_image size="s"}} 300w,
+                                    {{img_url feature_image size="m"}} 600w,
+                                    {{img_url feature_image size="l"}} 1000w,
+                                    {{img_url feature_image size="xl"}} 2000w"
+                            sizes="100vw"
+                            src="{{img_url feature_image size="xl"}}"
+                            alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                            loading="eager" />
+                        {{/if}}
+                        <div class="hero-large-overlay"></div>
+                    </div>
+                    <div class="hero-large-content">
+                        <div class="hero-large-meta-top">
+                            {{#primary_tag}}
+                            <a href="{{url}}" class="hero-large-tag">{{name}}</a>
+                            {{/primary_tag}}
+                            <span class="hero-large-featured-badge">{{> "icons/fire"}} Featured</span>
+                        </div>
+                        <h1 class="hero-large-title">
+                            <a href="{{url}}">{{title}}</a>
+                        </h1>
+                        {{#if excerpt}}
+                        <p class="hero-large-excerpt">{{excerpt words="30"}}</p>
+                        {{/if}}
+                        <div class="hero-large-meta">
+                            {{#primary_author}}
+                            <a href="{{url}}" class="hero-large-author">
+                                {{#if profile_image}}
+                                <img src="{{img_url profile_image size="xs"}}" alt="{{name}}" class="hero-large-author-image" />
+                                {{/if}}
+                                <span>{{name}}</span>
+                            </a>
+                            {{/primary_author}}
+                            <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMM D, YYYY"}}</time>
+                            {{#if reading_time}}
+                            <span>{{reading_time}}</span>
+                            {{/if}}
+                        </div>
+                        <a href="{{url}}" class="hero-large-btn">Read Article</a>
+                    </div>
+                </article>
+                {{/foreach}}
+                {{else}}
+                <div class="hero-welcome">
+                    <h1 class="hero-welcome-title">{{@site.title}}</h1>
+                    {{#if @site.description}}
+                    <p class="hero-welcome-description">{{@site.description}}</p>
+                    {{/if}}
+                </div>
+                {{/if}}
+            {{/get}}
+        {{else match @custom.hero_style "Grid featured"}}
+            {{!-- Grid of Featured Posts --}}
+            {{#get "posts" filter="featured:true" limit="4" include="tags,authors"}}
+                {{#if posts}}
+                <div class="hero-grid-wrapper">
+                    {{#foreach posts}}
+                    <article class="hero-grid-item{{#if @first}} hero-grid-item-large{{/if}}">
+                        <a href="{{url}}" class="hero-grid-link">
+                            {{#if feature_image}}
+                            <img srcset="{{img_url feature_image size="s"}} 300w,
+                                        {{img_url feature_image size="m"}} 600w,
+                                        {{img_url feature_image size="l"}} 1000w"
+                                sizes="{{#if @first}}(min-width: 768px) 60vw, 100vw{{else}}(min-width: 768px) 40vw, 100vw{{/if}}"
+                                src="{{img_url feature_image size="l"}}"
+                                alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                                class="hero-grid-image"
+                                loading="{{#if @first}}eager{{else}}lazy{{/if}}" />
+                            {{/if}}
+                            <div class="hero-grid-overlay"></div>
+                            <div class="hero-grid-content">
+                                {{#primary_tag}}
+                                <span class="hero-grid-tag">{{name}}</span>
+                                {{/primary_tag}}
+                                <h3 class="hero-grid-title">{{title}}</h3>
+                                <div class="hero-grid-meta">
+                                    <span>{{date format="MMM D"}}</span>
+                                    {{#if reading_time}}<span>{{reading_time}}</span>{{/if}}
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                    {{/foreach}}
+                </div>
+                {{else}}
+                <div class="hero-welcome">
+                    <h1 class="hero-welcome-title">{{@site.title}}</h1>
+                    {{#if @site.description}}
+                    <p class="hero-welcome-description">{{@site.description}}</p>
+                    {{/if}}
+                </div>
+                {{/if}}
+            {{/get}}
+        {{else}}
+            {{!-- Minimal Hero --}}
+            <div class="hero-minimal-content">
+                <h1 class="hero-minimal-title">{{@site.title}}</h1>
+                {{#if @site.description}}
+                <p class="hero-minimal-description">{{@site.description}}</p>
+                {{/if}}
+            </div>
+        {{/match}}
     </div>
+</section>
+{{/is}}
+{{/is}}
+{{/if}}
 
-    {{pagination}}
+{{!-- Main Content Area --}}
+<section class="content-section">
+    <div class="container">
+        {{!-- Section Header --}}
+        {{#is "home"}}
+        <header class="section-header">
+            <h2 class="section-title">Latest Posts</h2>
+            <p class="section-description">Explore our newest articles and insights</p>
+        </header>
+        {{/is}}
 
-</div>
-</main>
+        {{#is "paged"}}
+        <header class="section-header">
+            <h2 class="section-title">All Posts</h2>
+            <p class="section-description">Page {{pagination.page}} of {{pagination.pages}}</p>
+        </header>
+        {{/is}}
+
+        {{!-- Post Feed --}}
+        <div class="post-feed{{#match @custom.feed_layout "Magazine grid"}} feed-magazine{{else match @custom.feed_layout "Classic list"}} feed-classic{{else match @custom.feed_layout "Masonry"}} feed-masonry{{else}} feed-cards{{/match}}">
+            {{#foreach posts}}
+                {{> "post-card"}}
+            {{/foreach}}
+        </div>
+
+        {{!-- Pagination --}}
+        {{#if pagination.pages}}
+        {{#if pagination.next}}
+        <nav class="pagination">
+            <a href="{{pagination.next}}" class="pagination-btn pagination-next">
+                <span>Load more posts</span>
+                {{> "icons/arrow-down"}}
+            </a>
+        </nav>
+        {{/if}}
+        {{/if}}
+    </div>
+</section>

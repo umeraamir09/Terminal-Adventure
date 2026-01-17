@@ -1,78 +1,90 @@
-{{!-- This is a partial file used to generate a post "card"
-which templates loop over to generate a list of posts. --}}
+{{!-- Post Card Partial - Modern magazine style card --}}
 
-<article class="post-card {{post_class}}{{#match @custom.feed_layout "Classic"}}{{#is "home"}}{{#has index="0"}} post-card-large{{/has}}{{#has index="1,2"}} dynamic{{/has}}{{/is}}{{/match}}{{#match @custom.feed_layout "Grid"}} keep-ratio{{/match}}{{#match @custom.feed_layout "List"}}{{^is "tag, author"}} post-card-large{{/is}}{{/match}}{{#unless access}} post-access-{{visibility}}{{/unless}}">
-
+<article class="post-card {{post_class}}{{#if featured}} post-card-featured{{/if}}{{#unless feature_image}} post-card-no-image{{/unless}}">
+    {{!-- Card Image --}}
     {{#if feature_image}}
-    <a class="post-card-image-link" href="{{url}}">
+    <a href="{{url}}" class="post-card-image-link" aria-label="Read {{title}}">
+        <div class="post-card-image-wrapper">
+            <img class="post-card-image"
+                srcset="{{img_url feature_image size="s"}} 300w,
+                        {{img_url feature_image size="m"}} 600w,
+                        {{img_url feature_image size="l"}} 1000w"
+                sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 400px"
+                src="{{img_url feature_image size="m"}}"
+                alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                loading="lazy" />
+            <div class="post-card-image-overlay"></div>
+            
+            {{!-- Reading time badge --}}
+            {{#if reading_time}}
+            <span class="post-card-reading-badge">{{reading_time}}</span>
+            {{/if}}
+        </div>
 
-        {{!-- This is a responsive image, it loads different sizes depending on device
-        https://medium.freecodecamp.org/a-guide-to-responsive-images-with-ready-to-use-templates-c400bd65c433 --}}
-        <img class="post-card-image"
-            srcset="{{img_url feature_image size="s"}} 300w,
-                    {{img_url feature_image size="m"}} 600w,
-                    {{img_url feature_image size="l"}} 1000w,
-                    {{img_url feature_image size="xl"}} 2000w"
-            sizes="(max-width: 1000px) 400px, 800px"
-            src="{{img_url feature_image size="m"}}"
-            alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
-            loading="lazy"
-        />
-
+        {{!-- Access indicator for members content --}}
         {{#unless access}}
         {{^has visibility="public"}}
-            <div class="post-card-access">
-                {{> "icons/lock"}}
-                {{#has visibility="members"}}
-                    Members only
-                {{else}}
-                    Paid-members only
-                {{/has}}
-            </div>
+        <div class="post-card-access-badge">
+            {{> "icons/lock"}}
+            <span>{{#has visibility="members"}}Members{{else}}Paid{{/has}}</span>
+        </div>
         {{/has}}
         {{/unless}}
-
     </a>
     {{/if}}
 
+    {{!-- Card Content --}}
     <div class="post-card-content">
-
-        <a class="post-card-content-link" href="{{url}}">
-            <header class="post-card-header">
-                <div class="post-card-tags">
-                    {{#primary_tag}}
-                        <span class="post-card-primary-tag">{{name}}</span>
-                    {{/primary_tag}}
-                    {{#if featured}}
-                        <span class="post-card-featured">{{> "icons/fire"}} Featured</span>
-                    {{/if}}
-                </div>
-                <h2 class="post-card-title">
-                    {{#unless access}}
-                    {{^has visibility="public"}}
-                        {{#unless feature_image}}
-                            {{> "icons/lock"}}
-                        {{/unless}}
-                    {{/has}}
-                    {{/unless}}
-                    {{title}}
-                </h2>
-            </header>
-            {{#if excerpt}}
-                <div class="post-card-excerpt">{{excerpt}}</div>
+        {{!-- Meta tags --}}
+        <div class="post-card-meta-top">
+            {{#primary_tag}}
+            <a href="{{url}}" class="post-card-tag">{{name}}</a>
+            {{/primary_tag}}
+            {{#if featured}}
+            <span class="post-card-featured-badge">{{> "icons/fire"}} Featured</span>
             {{/if}}
-        </a>
+        </div>
 
+        {{!-- Title --}}
+        <h3 class="post-card-title">
+            <a href="{{url}}">
+                {{#unless access}}
+                {{^has visibility="public"}}
+                {{#unless feature_image}}
+                {{> "icons/lock"}}
+                {{/unless}}
+                {{/has}}
+                {{/unless}}
+                {{title}}
+            </a>
+        </h3>
+
+        {{!-- Excerpt --}}
+        {{#if excerpt}}
+        <p class="post-card-excerpt">{{excerpt words="25"}}</p>
+        {{/if}}
+
+        {{!-- Bottom Meta --}}
         <footer class="post-card-meta">
-            <time class="post-card-meta-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="DD MMM YYYY"}}</time>
-            {{#if reading_time}}
-                <span class="post-card-meta-length">{{reading_time}}</span>
-            {{/if}}
+            {{!-- Author --}}
+            {{#primary_author}}
+            <a href="{{url}}" class="post-card-author">
+                {{#if profile_image}}
+                <img src="{{img_url profile_image size="xs"}}" alt="{{name}}" class="post-card-author-image" />
+                {{/if}}
+                <span class="post-card-author-name">{{name}}</span>
+            </a>
+            {{/primary_author}}
+
+            {{!-- Date --}}
+            <time class="post-card-date" datetime="{{date format="YYYY-MM-DD"}}">
+                {{date format="MMM D, YYYY"}}
+            </time>
+
+            {{!-- Comments count --}}
             {{#if @site.comments_enabled}}
-                {{comment_count}}
+            {{comment_count}}
             {{/if}}
         </footer>
-
     </div>
-
 </article>

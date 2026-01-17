@@ -46,9 +46,9 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/umeraamir09/Terminal-Adventure.git"
+        "url": "https://github.com/umeraamir09/enjin-inspired-ghost-theme.git"
     },
-    "bugs": "https://github.com/umeraamir09/Terminal-Adventure/issues",
+    "bugs": "https://github.com/umeraamir09/enjin-inspired-ghost-theme/issues",
     "devDependencies": {
         "@tryghost/release-utils": "0.8.1",
         "autoprefixer": "10.4.23",

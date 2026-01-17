@@ -418,19 +418,23 @@
 
     /**
      * FitVids - Responsive Videos
+     * Uses built-in FitVids implementation below
      */
     function initFitVids() {
         const content = document.querySelector('.post-content, .gh-content');
-        if (!content || typeof $ === 'undefined' || !$.fn.fitVids) return;
+        if (!content || typeof $ === 'undefined') return;
         
+        // Use our built-in FitVids implementation
         $(content).fitVids();
     }
 
     /**
      * Image Lightbox
+     * Note: Requires PhotoSwipe library to be loaded.
+     * PhotoSwipe is included in Ghost's card assets when enabled in package.json
      */
     function initLightbox() {
-        // Check if PhotoSwipe is available
+        // Check if PhotoSwipe is available (loaded by Ghost for image galleries)
         if (typeof PhotoSwipe === 'undefined' || typeof PhotoSwipeUI_Default === 'undefined') {
             return;
         }
